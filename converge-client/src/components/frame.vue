@@ -14,10 +14,15 @@
     </div>
 </template>
 <script setup>
-import {appWindow} from "@tauri-apps/api/window";
+import { appWindow } from "@tauri-apps/api/window";
 
 </script>
 <style scoped lang="scss">
+.container {
+    position: sticky;
+    top: 0;
+}
+
 .head {
     height: 35px;
     width: 100%;
@@ -30,7 +35,8 @@ import {appWindow} from "@tauri-apps/api/window";
         line-height: 35px;
         font-size: 14px;
         font-weight: bold;
-        text-indent:60%;
+        text-indent: 60%;
+        user-select: none;
     }
 
     .btns {
