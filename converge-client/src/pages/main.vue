@@ -4,7 +4,7 @@
             <div class="msg_card" v-for="msg in data.msgList">
                 <div class="msg_sender">
                     <div>{{ msg.sender }}</div>
-                    <div>{{ msg.times }}</div>
+                    <div title="这条信息推送的客户端数量">{{ msg.times }}</div>
                 </div>
                 <div class="msg_content">{{ msg.content }}</div>
                 <div class="msg_date">{{ msg.date }}</div>
@@ -13,7 +13,7 @@
 
 
         <div class="fixed_btn">
-            <div title="设置" @click="to_top()"><img src="@/assets/icon/setting.png" alt=""></div>
+            <div title="设置" ><img src="@/assets/icon/setting.png" alt=""></div>
         </div>
     </div>
 </template>
@@ -24,7 +24,7 @@ let data = ref({
     msgList: [
         {
             content: "【知乎】你的验证码是 756332，此验证码用于登录知乎或重置密码。10 分钟内有效。",
-            times: 1,
+            times: 2,
             sender: "1882821192",
             date: "2024-08-12 12:22:00"
         }, {
@@ -86,10 +86,21 @@ let data = ref({
 
             >div:nth-child(2) {
                 float: right;
-                width: 20px;
+                width: 25px;
+                height: 25px;
                 background-repeat: no-repeat;
                 background-image: url("/src/assets/icon/rt.png");
                 background-size: 100%;
+                margin-top: -5px;
+                margin-right: -5px;
+                text-align: center;
+                text-indent: 12px;
+                font-size: 13px;
+                font-weight: bold;
+                color: white;
+                user-select: none;
+                
+                
             }
         }
 
