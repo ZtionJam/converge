@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: Converge-Server
+server:
+  port: 8081
+converge:
+  max-user: 1000
+  max-user-connect: 50
+  max-total-connect: 100000
