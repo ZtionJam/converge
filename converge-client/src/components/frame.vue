@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <div class="head">
-            <div class="title" data-tauri-drag-region>焦距</div>
+            <div class="title" data-tauri-drag-region>{{ title }}</div>
             <div class="btns">
                 <div @click="appWindow.minimize()" class="min">
                     <img src="@/assets/icon/min.png" alt />
@@ -15,6 +15,11 @@
 </template>
 <script setup>
 import { appWindow } from "@tauri-apps/api/window";
+import { useRoute, useRouter } from "vue-router";
+import { ref } from "vue";
+const route = useRoute();
+let title = ref(route.meta.title)
+console.log(title)
 
 </script>
 <style scoped lang="scss">
@@ -42,9 +47,11 @@ import { appWindow } from "@tauri-apps/api/window";
     .btns {
         width: 20%;
         height: 100%;
-        background: #888;
         display: flex;
 
+        .min:hover{
+            background: #888;
+        }
         .close:hover {
             background: red;
         }

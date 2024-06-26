@@ -13,13 +13,14 @@
 
 
         <div class="fixed_btn">
-            <div title="设置" ><img src="@/assets/icon/setting.png" alt=""></div>
+            <div title="设置" @click="open_setting"><img src="@/assets/icon/setting.png" alt=""></div>
         </div>
     </div>
 </template>
 <script setup>
 import { ref } from 'vue';
-
+import { WebviewWindow } from '@tauri-apps/api/window'
+import { invoke } from '@tauri-apps/api/tauri'
 let data = ref({
     msgList: [
         {
@@ -27,37 +28,17 @@ let data = ref({
             times: 2,
             sender: "1882821192",
             date: "2024-08-12 12:22:00"
-        }, {
-            content: "Text Message",
-            times: 1,
-            sender: "1882821192"
-        }, {
-            content: "Text Message",
-            times: 1,
-            sender: "1882821192"
-        }, {
-            content: "Text Message",
-            times: 1,
-            sender: "1882821192"
-        }, {
-            content: "Text Message",
-            times: 1,
-            sender: "1882821192"
-        }, {
-            content: "Text Message",
-            times: 1,
-            sender: "1882821192"
-        }, {
-            content: "Text Message",
-            times: 1,
-            sender: "1882821192"
-        }, {
-            content: "Text Message",
-            times: 1,
-            sender: "1882821192"
         }
-    ]
+    ],
+    server: {
+        host: "http://127.0.0.1:8081/msg/listen",
+        id: "123",
+        id2: "123"
+    }
 });
+const open_setting = () => {
+    invoke('setting')
+}
 </script>
 <style scoped lang="scss">
 .msg_list {
@@ -99,8 +80,8 @@ let data = ref({
                 font-weight: bold;
                 color: white;
                 user-select: none;
-                
-                
+
+
             }
         }
 

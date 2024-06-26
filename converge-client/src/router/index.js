@@ -1,5 +1,6 @@
-import {createRouter, createWebHashHistory} from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import main from '@/pages/main.vue'
+import setting from '@/pages/setting.vue'
 
 const routes = [
     {
@@ -11,11 +12,16 @@ const routes = [
         component: main,
         name: "mainPage",
         meta: {
-            title: '马克贴',
-            keepAlive: true,
-            saveScrollPosition: true,
-            scrollBoxId: "box",
-            savePosition: 0
+            title: '焦距',
+        }
+
+    },
+    {
+        path: "/setting",
+        component: setting,
+        name: "setting",
+        meta: {
+            title: '设置',
         }
 
     }
