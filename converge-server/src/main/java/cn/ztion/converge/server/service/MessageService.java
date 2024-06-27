@@ -1,6 +1,7 @@
 package cn.ztion.converge.server.service;
 
 import cn.ztion.converge.server.domain.Msg;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 
@@ -16,7 +17,7 @@ public interface MessageService {
      *
      * @param msg msg
      */
-    void pushMsg(Msg msg);
+    void pushMsg(Msg msg) throws JsonProcessingException;
 
     /**
      * Listen id

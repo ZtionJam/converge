@@ -23,7 +23,10 @@
     </div>
 </template>
 <script setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
+import Notice from '@/components/js/notice.js';
+import { invoke } from '@tauri-apps/api/tauri'
+import { tauri } from '@tauri-apps/api';
 
 let data = ref({
     host: "http://127.0.0.1:8081/msg/listen",
@@ -32,8 +35,22 @@ let data = ref({
     notify: false
 })
 
-const save=()=>{
-    
+onMounted(() => {
+    let server = localStorage.getItem("server");
+    if (server.length > 0) {
+        data.value = JSON.parse(server);
+    }
+})
+
+const save = () => {
+    if (data.value.host.length == 0 || data.value.id.length == 0) {
+        Notice("❌服务器地址和ID是必填的");
+        return;
+    }
+    localStorage.setItem("server", JSON.stringify(data.value));
+    Notice("✔保存成功")
+    console.log({ server: { ...data.value } })
+    invoke("connect", { server: { ...data.value } })
 }
 
 </script>

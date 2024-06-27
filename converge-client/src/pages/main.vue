@@ -19,8 +19,10 @@
 </template>
 <script setup>
 import { ref } from 'vue';
-import { WebviewWindow } from '@tauri-apps/api/window'
+import { listen } from '@tauri-apps/api/event'
 import { invoke } from '@tauri-apps/api/tauri'
+import Notice from '@/components/js/notice.js';
+
 let data = ref({
     msgList: [
         {
@@ -39,6 +41,13 @@ let data = ref({
 const open_setting = () => {
     invoke('setting')
 }
+listen('notify', (e) => {
+    Notice(e.payload.message)
+})
+listen('msg', (e) => {
+    console.log(e.payload.message)
+    data.value.msgList.push(JSON.parse(e.payload.message));
+})
 </script>
 <style scoped lang="scss">
 .msg_list {

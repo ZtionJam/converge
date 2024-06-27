@@ -15,11 +15,15 @@
 </template>
 <script setup>
 import { appWindow } from "@tauri-apps/api/window";
-import { useRoute, useRouter } from "vue-router";
-import { ref } from "vue";
-const route = useRoute();
-let title = ref(route.meta.title)
-console.log(title)
+import { ref,onMounted } from "vue";
+
+let title = ref("焦距")
+onMounted(() => {
+    setTimeout(() => {
+        title.value = document.title
+    }, 1);
+
+})
 
 </script>
 <style scoped lang="scss">
@@ -49,9 +53,10 @@ console.log(title)
         height: 100%;
         display: flex;
 
-        .min:hover{
+        .min:hover {
             background: #888;
         }
+
         .close:hover {
             background: red;
         }

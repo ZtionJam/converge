@@ -22,7 +22,7 @@ public class MessageController {
     private final MessageService messageService;
 
     @PostMapping
-    public R<Msg> upload(@RequestBody @Validated Msg msg) {
+    public R<Msg> upload(@RequestBody @Validated Msg msg) throws Exception {
         this.messageService.pushMsg(msg);
         return R.ok(msg);
     }

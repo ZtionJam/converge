@@ -1,8 +1,11 @@
 package cn.ztion.converge.server.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
+
+import java.util.Date;
 
 /**
  * Message
@@ -33,5 +36,11 @@ public class Msg {
      * The number of times this text message was pushed
      */
     private Integer times;
+    /**
+     * Rec Time
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date date;
+
 
 }

@@ -2,7 +2,10 @@ package cn.ztion.converge.server.service;
 
 import cn.ztion.converge.server.domain.Msg;
 import cn.ztion.converge.server.holder.ClientHolder;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.constraints.NotEmpty;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -13,13 +16,14 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
  * @date 2024/6/25
  */
 @Service
+@Slf4j
 public class MessageServiceImpl implements MessageService {
-
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
-    public void pushMsg(Msg msg) {
-        int push = ClientHolder.push(msg.getId() + msg.getId2(), msg.getContent());
-        msg.setTimes(push);
+    public void pushMsg(Msg msg) throws JsonProcessingException {
+        log.info("receive msg:{}", msg);
+        ClientHolder.push(msg.getId() + msg.getId2(), msg);
     }
 
     @Override
