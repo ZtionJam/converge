@@ -11,12 +11,17 @@ edition = "2021"
 tauri-build = { version = "1", features = [] }
 
 [dependencies]
-tauri = { version = "1", features = [ "system-tray", "window-all", "path-all", "shell-open"] }
+tauri = { version = "1", features = [
+    "system-tray",
+    "window-all",
+    "path-all",
+    "shell-open",
+] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 window-shadows = "0.2.2"
 reqwest = { version = "0.12.5", features = ["blocking", "gzip"] }
-tokio = "1.38.0"
+tokio = { version = "1.38.0", features = ["macros"] }
 lazy_static = "1.4.0"
 
 [features]

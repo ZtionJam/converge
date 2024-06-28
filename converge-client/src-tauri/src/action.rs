@@ -1,3 +1,5 @@
+use std::thread;
+
 use reqwest::Client;
 use tauri::{self, http::Uri, AppHandle, Manager, WindowBuilder, WindowUrl};
 use window_shadows::set_shadow;
@@ -40,29 +42,7 @@ pub async fn setting(handle: AppHandle) {
 
 #[tauri::command]
 pub async fn connect(app: AppHandle, server: Server) {
-    let mut url = server.host + "?id=" + &server.id;
-    if server.id2.len() > 0 {
-        url = url + "&id2=" + &server.id2;
-    }
-    let client = Client::new();
-    
-    let mut response = client.get(url).send().await.unwrap();
-
-    let mut msgBuff = String::new();
-    while let Some(item) = response.chunk().await.unwrap() {
-        msgBuff = msgBuff + &String::from_utf8_lossy(&item).to_string();
-        if msgBuff.ends_with("\n\n") {
-            if msgBuff.starts_with("data") {
-                println!("Received: {}", msgBuff);
-                if msgBuff.trim().eq("data:ok") {
-                    send_notify(app.clone(), "✔链接成功");
-                } else {
-                    send_msg(app.clone(), &msgBuff.trim().replace("data:", ""));
-                }
-            }
-
-            msgBuff.clear();
-        }
-    }
-    send_notify(app, "❌链接已断开");
+    let handle = tokio::spawn(async {
+        listen_sse(app, server).await;
+    });
 }
