@@ -23,7 +23,7 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public void pushMsg(Msg msg) throws JsonProcessingException {
         log.info("receive msg:{}", msg);
-        ClientHolder.push(msg.getId() + msg.getId2(), msg);
+        ClientHolder.push(msg.getId() +  (msg.getId2() == null ? "" : msg.getId2()), msg);
     }
 
     @Override

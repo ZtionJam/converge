@@ -27,6 +27,7 @@ import { onMounted, ref } from 'vue';
 import Notice from '@/components/js/notice.js';
 import { invoke } from '@tauri-apps/api/tauri'
 import { tauri } from '@tauri-apps/api';
+import { emit, listen } from '@tauri-apps/api/event'
 
 let data = ref({
     host: "http://127.0.0.1:8081/msg/listen",
@@ -49,10 +50,12 @@ const save = () => {
     }
     localStorage.setItem("server", JSON.stringify(data.value));
     Notice("✔保存成功")
-    console.log({ server: { ...data.value } })
+    
     invoke("connect", { server: { ...data.value } })
 }
-
+listen("notify", e => {
+  Notice(e.payload.message);
+});
 </script>
 <style scoped lang="scss">
 .container {

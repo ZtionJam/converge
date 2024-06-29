@@ -1,9 +1,9 @@
-use std::{sync::{Arc, Mutex}, time::Duration};
+use std::{clone, string};
 
-use lazy_static::lazy_static;
-use reqwest::Client;
-use tauri::{async_runtime::Receiver, AppHandle, Manager};
-use tokio::{sync::{ mpsc}, time::timeout};
+use tauri::api::notification::Notification;
+use tauri::{AppHandle, Manager, WindowBuilder};
+use tokio::sync::mpsc;
+use window_shadows::set_shadow;
 
 #[derive(Clone, serde::Serialize)]
 pub struct Payload {
@@ -16,6 +16,23 @@ pub struct Server {
     pub id: String,
     pub id2: String,
     pub notify: bool,
+}
+#[derive(Clone, serde::Serialize, serde::Deserialize, Debug)]
+pub struct Msg {
+    pub content: String,
+    pub id: String,
+    pub id2: String
+}
+impl Server {
+    pub fn get_url(&self) -> String {
+        return {
+            let mut first = self.host.clone() + "?id=" + self.id.as_str();
+            if self.id2.len() > 0 {
+                first = first + "&id2=" + self.id2.as_str();
+            }
+            first
+        };
+    }
 }
 
 pub fn send_notify(app: AppHandle, msg: &str) {
@@ -36,72 +53,42 @@ pub fn send_msg(app: AppHandle, msg: &str) {
     );
 }
 
-pub async fn listen_sse(app: AppHandle, server: Server) {
-    let mut url = server.host + "?id=" + &server.id;
-    if server.id2.len() > 0 {
-        url = url + "&id2=" + &server.id2;
+pub fn is_end_of_sse(msg: &str) -> bool {
+    msg.ends_with("\n\n")
+}
+pub fn check_sse_data(msg: &str, app: AppHandle) -> bool {
+    if msg.trim().eq("data:ok") {
+        let _ = app
+            .tray_handle()
+            .get_item("Status")
+            .set_title("状态：已连接");
+        send_notify(app, "✔连接成功");
+    } else if msg.trim().starts_with("data:") {
+        return true;
     }
-    let client = Client::new();
-
-    let mut response = client.get(url).send().await.unwrap();
-
-    let mut msgBuff = String::new();
-    while let Some(item) = response.chunk().await.unwrap() {
-        msgBuff = msgBuff + &String::from_utf8_lossy(&item).to_string();
-        if msgBuff.ends_with("\n\n") {
-            if msgBuff.starts_with("data") {
-                println!("Received: {}", msgBuff);
-                if msgBuff.trim().eq("data:ok") {
-                    send_notify(app.clone(), "✔链接成功");
-                } else {
-                    send_msg(app.clone(), &msgBuff.trim().replace("data:", ""));
-                }
-            }
-
-            msgBuff.clear();
-        }
-    }
-    send_notify(app, "❌链接已断开");
+    false
 }
 
-pub async fn listen(app: AppHandle, serverStr: String, mut rx:Arc<Mutex<mpsc::Receiver<String>>>) {
-    // let mut url = server.host + "?id=" + &server.id;
-    // if server.id2.len() > 0 {
-    //     url = url + "&id2=" + &server.id2;
-    // }
-    // let client = Client::new();
+pub fn open_main_window(app: &AppHandle) {
+    if let None = app.get_window("main") {
+        let windows_config = app.config().tauri.windows.get(0).unwrap().clone();
+        let window = WindowBuilder::from_config(app, windows_config)
+            .build()
+            .unwrap();
+        #[cfg(any(windows, target_os = "macos"))]
+        set_shadow(&window, true).unwrap();
+    } else {
+        let _ = app.get_window("main").unwrap().set_focus();
+    }
+}
 
-    // let mut response = client.get(url).send().await.unwrap();
+pub fn send_system_notify(app: &AppHandle, title: String, body: String) {
+    let _ = Notification::new(app.config().tauri.bundle.identifier.clone())
+        .title(title)
+        .body(body)
+        .show();
+}
 
-    // loop {
-    //     tokio::select! {
-    //         biased;
-
-    //         _ = rx.recv() => {
-    //             println!("接收到停止信号");
-    //             break;
-    //         }
-
-    //         result = timeout(Duration::from_secs(5), response.chunk()) => {
-    //             match result {
-    //                 Ok(Ok(Some(chunk))) => {
-    //                     println!("Received chunk: {:?}", chunk);
-    //                     // 处理 chunk
-    //                 },
-    //                 Ok(Ok(None)) => {
-    //                     println!("No more chunks.");
-    //                     break;
-    //                 },
-    //                 Ok(Err(e)) => {
-    //                     println!("Error reading chunk: {:?}", e);
-    //                     break;
-    //                 },
-    //                 Err(_) => {
-    //                     println!("Timeout waiting for chunk");
-    //                     // 可选择此处退出或者继续尝试
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
+pub struct AppState {
+    pub current_channel: Option<mpsc::Sender<i32>>,
 }

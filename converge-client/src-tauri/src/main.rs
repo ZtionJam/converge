@@ -3,57 +3,62 @@ use std::sync::{Arc, Mutex};
 
 use tauri::{CustomMenuItem, SystemTrayMenu, SystemTrayMenuItem};
 use tauri::{Manager, SystemTray};
-use tokio::sync::{broadcast, mpsc};
-use util::listen;
+use util::{open_main_window, AppState};
 use window_shadows::set_shadow;
 mod action;
 mod util;
+use tauri::SystemTrayEvent::*;
 
 #[tauri::command]
 fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
 }
-
-fn main() {
+#[tokio::main]
+async fn main() {
     //tray
-    let quit = CustomMenuItem::new("quit".to_string(), "Quit");
-    let hide = CustomMenuItem::new("hide".to_string(), "Hide");
+    let status = CustomMenuItem::new("Status".to_string(), "状态:未连接");
+    let quit = CustomMenuItem::new("Quit".to_string(), "关闭");
+    let hide = CustomMenuItem::new("Open".to_string(), "打开主界面");
     let tray_menu = SystemTrayMenu::new()
+        .add_item(status)
+        .add_native_item(SystemTrayMenuItem::Separator)
         .add_item(quit)
         .add_native_item(SystemTrayMenuItem::Separator)
         .add_item(hide);
 
     let tray = SystemTray::new().with_menu(tray_menu);
     //channel
-    let (tx, mut rx) = mpsc::channel::<String>(10);
-    let s_tx = Arc::new(tx);
-    let s_rx = Arc::new(Mutex::new(rx));
-    let share_tx = Arc::clone(&s_tx);
-    let share_rx = Arc::clone(&s_rx);
+    let app_state = Arc::new(Mutex::new(AppState {
+        current_channel: None,
+    }));
+
     tauri::Builder::default()
-        .setup(move |app| {
+        .manage(app_state)
+        .setup(|app| {
             let main_window = app.get_window("main").unwrap();
             #[cfg(any(windows, target_os = "macos"))]
             set_shadow(&main_window, true).unwrap();
-
-            //disconnect
-            let _ = app.listen_global("disconnect", move |_| {
-                let _ = share_tx.send("1".to_string());
-            });
-
-            //connect
-            let _ = app.listen_global("connect", move |e| {
-                // let share_rx = Arc::clone(&s_rx);
-                e.payload();
-            });
-
             Ok(())
         })
         .system_tray(tray)
+        .on_system_tray_event(|app, event| match event {
+            MenuItemClick { id, .. } => {
+                let id = id.as_str();
+                match id {
+                    "Open" => open_main_window(app),
+                    "Quit" => app.exit(0),
+                    _ => {}
+                }
+            }
+            LeftClick { .. } => {
+                open_main_window(app);
+            }
+            _ => {}
+        })
         .invoke_handler(tauri::generate_handler![
             greet,
             action::setting,
-            action::connect
+            action::connect,
         ])
         .build(tauri::generate_context!())
         .unwrap()

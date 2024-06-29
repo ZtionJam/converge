@@ -29,6 +29,6 @@ public class MessageController {
 
     @GetMapping("/listen")
     public SseEmitter listen(@RequestParam String id, String id2) {
-        return this.messageService.listen(id + id2);
+        return this.messageService.listen(id + (id2 == null ? "" : id2));
     }
 }

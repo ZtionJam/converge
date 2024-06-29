@@ -49,8 +49,7 @@
       ]
     },
     "systemTray": {
-      "iconPath": "icons/icon.png",
-      "iconAsTemplate": true
+      "iconPath": "icons/icon.png"
     }
   }
 }
