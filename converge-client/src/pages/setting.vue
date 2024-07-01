@@ -18,7 +18,7 @@
             </div>
         </div>
         <div class="btns">
-            <div class="save" @click="save">保存</div>
+            <div class="save" @click="save">保存并连接</div>
         </div>
     </div>
 </template>
@@ -30,8 +30,8 @@ import { tauri } from '@tauri-apps/api';
 import { emit, listen } from '@tauri-apps/api/event'
 
 let data = ref({
-    host: "http://127.0.0.1:8081/msg/listen",
-    id: "",
+    host: "http://msg.ztion.cn/msg/listen",
+    id: "demo",
     id2: "",
     notify: false
 })
@@ -135,7 +135,7 @@ listen("notify", e => {
         justify-content: center;
 
         .save {
-            width: 100px;
+            width: 120px;
             background-color: orange;
             height: 35px;
             border-radius: 5px;

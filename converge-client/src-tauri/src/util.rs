@@ -1,4 +1,3 @@
-use std::{clone, string};
 
 use tauri::api::notification::Notification;
 use tauri::{AppHandle, Manager, WindowBuilder};
@@ -62,7 +61,7 @@ pub fn check_sse_data(msg: &str, app: AppHandle) -> bool {
             .tray_handle()
             .get_item("Status")
             .set_title("状态：已连接");
-        send_notify(app, "✔连接成功");
+        send_notify(app, "✔已连接成功");
     } else if msg.trim().starts_with("data:") {
         return true;
     }

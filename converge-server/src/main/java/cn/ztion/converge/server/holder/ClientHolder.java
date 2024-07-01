@@ -30,17 +30,17 @@ public class ClientHolder {
         List<SseEmitter> sseEmitters = CLIENTS.get(id);
         int success = 0;
         if (sseEmitters != null) {
+            msg.setDate(new Date());
             for (SseEmitter emitter : sseEmitters) {
                 try {
+                    msg.setTimes(success);
                     emitter.send(SseEmitter.event().data(mapper.writeValueAsString(msg), MediaType.TEXT_PLAIN));
                     success++;
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     log.error("Message send error{}", id);
                 }
             }
         }
-        msg.setTimes(success);
-        msg.setDate(new Date());
         return success;
     }
 
@@ -51,7 +51,7 @@ public class ClientHolder {
             for (SseEmitter emitter : sseEmitters) {
                 try {
                     emitter.send(SseEmitter.event().data(msg, MediaType.TEXT_PLAIN));
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     log.error("Message send error{}", id);
                 }
             }
@@ -76,7 +76,7 @@ public class ClientHolder {
     private static boolean check(SseEmitter emitter) {
         try {
             emitter.send(SseEmitter.event().name("message").data("Are you Ok?"));
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return false;
         }
         return true;

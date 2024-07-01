@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
-import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import java.util.Date;
 
@@ -27,6 +26,11 @@ public class Msg {
      */
     @Length(max = 128, message = "Max length 32")
     private String id2;
+    /**
+     * sender
+     */
+    @Length(max = 32, message = "Max length 32")
+    private String sender;
     /**
      * Message content
      */

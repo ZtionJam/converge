@@ -1,8 +1,8 @@
 [package]
-name = "converge-client"
-version = "0.0.0"
-description = "A Tauri App"
-authors = ["you"]
+name = "Converge"
+version = "1.0.0"
+description = "焦距"
+authors = ["ZtionJam"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

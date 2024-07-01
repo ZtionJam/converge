@@ -110,7 +110,7 @@ pub async fn connect(
         .tray_handle()
         .get_item("Status")
         .set_title("状态：未连接");
-    send_notify(app, "❌链接已断开");
+    send_notify(app, "❌链接断开");
 
     Ok(())
 }

@@ -6,8 +6,8 @@
     "distDir": "../dist"
   },
   "package": {
-    "productName": "converge-client",
-    "version": "0.0.0"
+    "productName": "Converge",
+    "version": "1.0.0"
   },
   "tauri": {
     "allowlist": {
@@ -37,6 +37,11 @@
       "csp": null
     },
     "bundle": {
+      "windows": {
+        "wix": {
+          "language": "zh-CN"
+        }
+      },
       "active": true,
       "targets": "all",
       "identifier": "cn.ztion.converge.client",
