@@ -1,5 +1,5 @@
 [package]
-name = "Converge"
+name = "converge"
 version = "1.0.0"
 description = "焦距"
 authors = ["ZtionJam"]

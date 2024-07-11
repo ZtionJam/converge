@@ -3,20 +3,6 @@
 version = 3
 
 [[package]]
-name = "Converge"
-version = "1.0.0"
-dependencies = [
- "lazy_static",
- "reqwest",
- "serde",
- "serde_json",
- "tauri",
- "tauri-build",
- "tokio",
- "window-shadows",
-]
-
-[[package]]
 name = "addr2line"
 version = "0.22.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -567,6 +553,20 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4ca0197aee26d1ae37445ee532fefce43251d24cc7c166799f4d46817f1d3973"
 dependencies = [
  "crossbeam-utils",
+]
+
+[[package]]
+name = "converge"
+version = "1.0.0"
+dependencies = [
+ "lazy_static",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-build",
+ "tokio",
+ "window-shadows",
 ]
 
 [[package]]

@@ -1,4 +1,3 @@
-
 use tauri::api::notification::Notification;
 use tauri::{AppHandle, Manager, WindowBuilder};
 use tokio::sync::mpsc;
@@ -20,7 +19,7 @@ pub struct Server {
 pub struct Msg {
     pub content: String,
     pub id: String,
-    pub id2: String
+    pub id2: String,
 }
 impl Server {
     pub fn get_url(&self) -> String {
@@ -52,20 +51,28 @@ pub fn send_msg(app: AppHandle, msg: &str) {
     );
 }
 
-pub fn is_end_of_sse(msg: &str) -> bool {
-    msg.ends_with("\n\n")
+//处理收到的信息
+pub fn process_msg(msg: Msg, app: AppHandle) {
+    send_system_notify(&app, "收到新消息".to_string(), msg.content.clone());
+    send_msg(app.clone(), serde_json::to_string(&msg).unwrap().as_str());
 }
-pub fn check_sse_data(msg: &str, app: AppHandle) -> bool {
-    if msg.trim().eq("data:ok") {
-        let _ = app
-            .tray_handle()
-            .get_item("Status")
-            .set_title("状态：已连接");
-        send_notify(app, "✔已连接成功");
-    } else if msg.trim().starts_with("data:") {
-        return true;
-    }
-    false
+
+//处理连接成功事件
+pub fn process_connection_ok(app: AppHandle) {
+    let _ = app
+        .tray_handle()
+        .get_item("Status")
+        .set_title("状态：已连接");
+    send_notify(app.clone(), "✔已连接成功");
+    send_notify(app, "✔已连接成功");
+}
+//处理连接断开事件
+pub fn process_connection_close(app: AppHandle) {
+    let _ = app
+        .tray_handle()
+        .get_item("Status")
+        .set_title("状态：未连接");
+    send_notify(app, "❌链接断开");
 }
 
 pub fn open_main_window(app: &AppHandle) {
@@ -90,4 +97,6 @@ pub fn send_system_notify(app: &AppHandle, title: String, body: String) {
 
 pub struct AppState {
     pub current_channel: Option<mpsc::Sender<i32>>,
+
+    pub msgs: Vec<Msg>,
 }

@@ -55,6 +55,9 @@ onMounted(() => {
     let s = JSON.parse(server);
     invoke("connect", { server: { ...s } });
   }
+  invoke("get_history").then(msgs=>{
+    data.value.msgList.push(...msgs);
+  });
 });
 const open_setting = () => {
   invoke("setting");

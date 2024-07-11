@@ -50,8 +50,8 @@ pub async fn connect(
     server: Server,
     state: State<'_, Arc<Mutex<AppState>>>,
 ) -> Result<(), ()> {
+    //注册mpsc，向上一个连接发送关闭消息,保存当前连接的sender
     let (tx, mut rx) = mpsc::channel::<i32>(10);
-    //close other connection
     {
         let mut state = state.lock().unwrap();
         if let Some(ref mut tx) = state.current_channel {
@@ -59,9 +59,11 @@ pub async fn connect(
         }
         state.current_channel = Some(tx);
     }
-    //start connection
-
-    let client = Client::new();
+    //开始发起连接
+    let client = Client::builder()
+        .timeout(Duration::from_secs(864000))
+        .build()
+        .unwrap();
     let mut response = match client.get(server.get_url()).send().await {
         Ok(res) => res,
         Err(_) => {
@@ -69,7 +71,6 @@ pub async fn connect(
             panic!("connection err");
         }
     };
-    let mut msg_buff = String::new();
     loop {
         tokio::select! {
             biased;
@@ -82,35 +83,40 @@ pub async fn connect(
             result = timeout(Duration::from_secs(5), response.chunk()) => {
                 match result {
                     Ok(Ok(Some(chunk))) => {
-                        msg_buff += &String::from_utf8_lossy(&chunk).to_string();
-                        if is_end_of_sse(&msg_buff) {
-                            println!("Received: {}", msg_buff);
-                            if check_sse_data(&msg_buff,app.clone()) {
-                                let json= &msg_buff.trim().replace("data:", "");
-                                send_msg(app.clone(),json);
-                                let msg:Msg=serde_json::from_str(json).unwrap();
-                                send_system_notify(&app, "收到新消息".to_string(), msg.content);
-                            }
-                            msg_buff.clear();
+                      let str=  &String::from_utf8_lossy(&chunk).to_string().replace("data:", "").trim().to_string();
+                      println!("消息:>>{}<<<",str);
+
+                      if let Ok(msg)=serde_json::from_str::<Msg>(str){
+                        {
+                            let mut state =  state.lock().unwrap();
+                            state.msgs.push(msg.clone());
                         }
+                        process_msg(msg,app.clone());
+                      }else if "ok".eq(str) {
+                        process_connection_ok(app.clone());
+                      }
                     },
                     Ok(Ok(None)) => {
                         send_system_notify(&app, "链接已断开".to_string(), "与服务器的链接已断开".to_string());
                         println!("链接关闭");
                         break;
                     },
-                    _=>{}
+                    _=>{
+                        println!("等待中");
+                    }
                 }
             }
         }
     }
     println!("连接已结束");
 
-    let _ = app
-        .tray_handle()
-        .get_item("Status")
-        .set_title("状态：未连接");
-    send_notify(app, "❌链接断开");
+    process_connection_close(app.clone());
 
     Ok(())
+}
+#[tauri::command]
+pub fn get_history(state: State<'_, Arc<Mutex<AppState>>>) -> Vec<Msg> {
+    let state = state.lock().unwrap();
+
+    state.msgs.clone()
 }

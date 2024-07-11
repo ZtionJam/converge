@@ -30,6 +30,7 @@ public class ClientHolder {
         List<SseEmitter> sseEmitters = CLIENTS.get(id);
         int success = 0;
         if (sseEmitters != null) {
+            log.info("找到客户端{}", sseEmitters.size());
             msg.setDate(new Date());
             for (SseEmitter emitter : sseEmitters) {
                 try {
@@ -37,7 +38,7 @@ public class ClientHolder {
                     emitter.send(SseEmitter.event().data(mapper.writeValueAsString(msg), MediaType.TEXT_PLAIN));
                     success++;
                 } catch (Throwable e) {
-                    log.error("Message send error{}", id);
+                    log.error("推送失败{}", id);
                 }
             }
         }
@@ -52,7 +53,7 @@ public class ClientHolder {
                 try {
                     emitter.send(SseEmitter.event().data(msg, MediaType.TEXT_PLAIN));
                 } catch (Throwable e) {
-                    log.error("Message send error{}", id);
+                    log.error("发送失败{}", id);
                 }
             }
         }
@@ -66,19 +67,10 @@ public class ClientHolder {
         push(id, "ok");
     }
 
-    public static void logOut(String id) {
+    public static void logOut(String id, SseEmitter emitter) {
         List<SseEmitter> sseEmitters = CLIENTS.get(id);
         if (sseEmitters != null) {
-            CLIENTS.put(id, sseEmitters.stream().filter(ClientHolder::check).toList());
+            CLIENTS.put(id, sseEmitters.stream().filter(sse -> !sse.equals(emitter)).toList());
         }
-    }
-
-    private static boolean check(SseEmitter emitter) {
-        try {
-            emitter.send(SseEmitter.event().name("message").data("Are you Ok?"));
-        } catch (Throwable e) {
-            return false;
-        }
-        return true;
     }
 }

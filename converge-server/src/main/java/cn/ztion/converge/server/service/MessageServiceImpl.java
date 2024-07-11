@@ -30,9 +30,9 @@ public class MessageServiceImpl implements MessageService {
     public SseEmitter listen(@NotEmpty String id) {
         SseEmitter emitter = new SseEmitter(10 * 24 * 60 * 60 * 1000L);
         ClientHolder.login(id, emitter);
-        emitter.onCompletion(() -> ClientHolder.logOut(id));
-        emitter.onError((e) -> ClientHolder.logOut(id));
-        emitter.onTimeout(() -> ClientHolder.logOut(id));
+        emitter.onCompletion(() -> ClientHolder.logOut(id, emitter));
+        emitter.onError((e) -> ClientHolder.logOut(id, emitter));
+        emitter.onTimeout(() -> ClientHolder.logOut(id, emitter));
         return emitter;
     }
 }

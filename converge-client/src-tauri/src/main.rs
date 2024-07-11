@@ -26,10 +26,11 @@ async fn main() {
         .add_native_item(SystemTrayMenuItem::Separator)
         .add_item(hide);
 
-    let tray = SystemTray::new().with_menu(tray_menu);
+    let tray = SystemTray::new().with_menu(tray_menu).with_tooltip("焦距");
     //channel
     let app_state = Arc::new(Mutex::new(AppState {
         current_channel: None,
+        msgs: Vec::new(),
     }));
 
     tauri::Builder::default()
@@ -59,6 +60,7 @@ async fn main() {
             greet,
             action::setting,
             action::connect,
+            action::get_history,
         ])
         .build(tauri::generate_context!())
         .unwrap()

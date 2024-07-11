@@ -6,7 +6,7 @@
     "distDir": "../dist"
   },
   "package": {
-    "productName": "Converge",
+    "productName": "焦距",
     "version": "1.0.0"
   },
   "tauri": {
