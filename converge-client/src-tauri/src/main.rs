@@ -1,14 +1,16 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 use std::sync::{Arc, Mutex};
+use std::time::Duration;
 
 use tauri::{CustomMenuItem, SystemTrayMenu, SystemTrayMenuItem};
 use tauri::{Manager, SystemTray};
-use util::{open_main_window, AppState};
+use tauri::SystemTrayEvent::*;
 use window_shadows::set_shadow;
+
+use util::{AppState, open_main_window};
+
 mod action;
 mod util;
-use tauri::SystemTrayEvent::*;
-
 #[tauri::command]
 fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
@@ -17,28 +19,38 @@ fn greet(name: &str) -> String {
 async fn main() {
     //tray
     let status = CustomMenuItem::new("Status".to_string(), "状态:未连接");
+    let open = CustomMenuItem::new("Open".to_string(), "打开主界面");
     let quit = CustomMenuItem::new("Quit".to_string(), "关闭");
-    let hide = CustomMenuItem::new("Open".to_string(), "打开主界面");
     let tray_menu = SystemTrayMenu::new()
         .add_item(status)
         .add_native_item(SystemTrayMenuItem::Separator)
-        .add_item(quit)
+        .add_item(open)
         .add_native_item(SystemTrayMenuItem::Separator)
-        .add_item(hide);
+        .add_item(quit);
 
     let tray = SystemTray::new().with_menu(tray_menu).with_tooltip("焦距");
-    //channel
+    //state
     let app_state = Arc::new(Mutex::new(AppState {
         current_channel: None,
         msgs: Vec::new(),
     }));
-
+    //args
+    let args: Vec<String> = std::env::args().collect();
+    let back_run = args.iter().any(|arg| arg.contains("back_run"));
     tauri::Builder::default()
         .manage(app_state)
-        .setup(|app| {
+        .setup(move |app| {
             let main_window = app.get_window("main").unwrap();
             #[cfg(any(windows, target_os = "macos"))]
             set_shadow(&main_window, true).unwrap();
+            //sample back run
+            if back_run {
+                let _ = main_window.hide();
+                tokio::spawn(async move {
+                    tokio::time::sleep(Duration::from_secs(5)).await;
+                    let _ = main_window.close();
+                });
+            }
             Ok(())
         })
         .system_tray(tray)

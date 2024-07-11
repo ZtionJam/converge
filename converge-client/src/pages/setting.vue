@@ -30,7 +30,7 @@ import { tauri } from '@tauri-apps/api';
 import { emit, listen } from '@tauri-apps/api/event'
 
 let data = ref({
-    host: "http://msg.ztion.cn/msg/listen",
+    host: "http://msgs.ztion.cn/msg/listen",
     id: "demo",
     id2: "",
     notify: false
@@ -50,7 +50,7 @@ const save = () => {
     }
     localStorage.setItem("server", JSON.stringify(data.value));
     Notice("✔保存成功")
-    
+
     invoke("connect", { server: { ...data.value } })
 }
 listen("notify", e => {
@@ -83,6 +83,7 @@ listen("notify", e => {
             width: 100px;
             font-size: 16px;
             font-weight: bold;
+            user-select: none;
         }
 
         >input[type='text'] {
@@ -143,12 +144,13 @@ listen("notify", e => {
             line-height: 35px;
             font-weight: bold;
             color: white;
-            box-shadow: 0 0px 5px rgba(23, 82, 30, 0.25);
+            box-shadow: 0 0 5px rgba(23, 82, 30, 0.25);
+            user-select: none;
 
             &:hover {
                 transition: all 200ms;
                 cursor: pointer;
-                box-shadow: 0 0px 5px rgba(23, 82, 30, 0.5);
+                box-shadow: 0 0 5px rgba(23, 82, 30, 0.5);
             }
 
             &:active {

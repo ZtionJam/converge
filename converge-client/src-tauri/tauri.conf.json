@@ -7,7 +7,7 @@
   },
   "package": {
     "productName": "焦距",
-    "version": "1.0.0"
+    "version": "1.0.1"
   },
   "tauri": {
     "allowlist": {
@@ -37,9 +37,20 @@
       "csp": null
     },
     "bundle": {
+      "shortDescription": "焦距-消息推送工具",
       "windows": {
         "wix": {
-          "language": "zh-CN"
+          "language": "zh-CN",
+          "bannerPath": "icons/banner.png",
+          "dialogImagePath": "icons/back.png"
+        },
+        "nsis": {
+          "installerIcon": "icons/icon.ico",
+          "headerImage": "icons/header.bmp",
+          "sidebarImage": "icons/sidebar.bmp",
+          "languages": [
+            "SimpChinese"
+          ]
         }
       },
       "active": true,
@@ -50,11 +61,23 @@
         "icons/128x128.png",
         "icons/128x128@2x.png",
         "icons/icon.icns",
+        "icons/banner.png",
+        "icons/back.png",
         "icons/icon.ico"
       ]
     },
     "systemTray": {
       "iconPath": "icons/icon.png"
+    },
+    "updater": {
+      "active": true,
+      "endpoints": [
+        "https://msg.ztion.cn/converge/update.json"
+      ],
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEE0MDk5MjU1MDY3NzE2M0MKUldROEZuY0dWWklKcEFHMHJ0aTJYN2RxRlZvS1pIaFJST0IyY1UzT0hvZzlucnpvc2QwNm9LREoK",
+      "windows": {
+        "installMode": "passive"
+      }
     }
   }
 }
