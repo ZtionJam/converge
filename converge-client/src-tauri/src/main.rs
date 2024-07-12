@@ -2,12 +2,13 @@
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
+use single_instance::SingleInstance;
+use tauri::SystemTrayEvent::*;
+use tauri::api::notification::Notification;
 use tauri::{CustomMenuItem, SystemTrayMenu, SystemTrayMenuItem};
 use tauri::{Manager, SystemTray};
-use tauri::SystemTrayEvent::*;
+use util::{open_main_window, AppState};
 use window_shadows::set_shadow;
-
-use util::{AppState, open_main_window};
 
 mod action;
 mod util;
@@ -17,6 +18,16 @@ fn greet(name: &str) -> String {
 }
 #[tokio::main]
 async fn main() {
+    let converge = SingleInstance::new("cn.ztion.converge.client").unwrap();
+    if !converge.is_single() {
+        let context = tauri::generate_context!();
+        Notification::new(&context.config().tauri.bundle.identifier)
+            .title("提示")
+            .body("焦距正在运行中，若窗口已关闭，可从托盘图标打开主界面。")
+            .show()
+            .unwrap();
+        return;
+    }
     //tray
     let status = CustomMenuItem::new("Status".to_string(), "状态:未连接");
     let open = CustomMenuItem::new("Open".to_string(), "打开主界面");
@@ -41,6 +52,7 @@ async fn main() {
         .manage(app_state)
         .setup(move |app| {
             let main_window = app.get_window("main").unwrap();
+            let _ = main_window.set_focus();
             #[cfg(any(windows, target_os = "macos"))]
             set_shadow(&main_window, true).unwrap();
             //sample back run
@@ -66,6 +78,7 @@ async fn main() {
             LeftClick { .. } => {
                 open_main_window(app);
             }
+
             _ => {}
         })
         .invoke_handler(tauri::generate_handler![

@@ -64,7 +64,6 @@ pub fn process_connection_ok(app: AppHandle) {
         .get_item("Status")
         .set_title("状态：已连接");
     send_notify(app.clone(), "✔已连接成功");
-    send_notify(app, "✔已连接成功");
 }
 //处理连接断开事件
 pub fn process_connection_close(app: AppHandle) {

@@ -1,6 +1,6 @@
 [package]
 name = "converge"
-version = "1.0.1"
+version = "1.0.2"
 description = "焦距"
 authors = ["ZtionJam"]
 edition = "2021"
@@ -11,7 +11,7 @@ edition = "2021"
 tauri-build = { version = "1", features = [] }
 
 [dependencies]
-tauri = { version = "1", features = [ "updater",
+tauri = { version = "1", features = ["updater",
     "system-tray",
     "window-all",
     "path-all",
@@ -24,6 +24,7 @@ window-shadows = "0.2.2"
 reqwest = { version = "0.12.5", features = ["blocking", "gzip"] }
 tokio = { version = "1.38.0", features = ["full"] }
 lazy_static = "1.4.0"
+single-instance = "0.3.3"
 
 [features]
 # This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!
