@@ -21,12 +21,20 @@ public class MessageController {
 
     private final MessageService messageService;
 
+    /**
+     * 消息接受并推送到已连接的客户端
+     *
+     * @param msg 消息
+     */
     @PostMapping
     public R<Msg> upload(@RequestBody @Validated Msg msg) throws Exception {
         this.messageService.pushMsg(msg);
         return R.ok(msg);
     }
 
+    /**
+     * SSE链接
+     */
     @GetMapping("/listen")
     public SseEmitter listen(@RequestParam String id, String id2) {
         return this.messageService.listen(id + (id2 == null ? "" : id2));
